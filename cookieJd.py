@@ -6,6 +6,10 @@ import cookielib
 from lxml import etree
 import sys
 import Cookie
+'''
+    写的有点乱哈，仅使用玩耍
+
+'''
 class loginParam:
     
     def __init__(self):
@@ -51,7 +55,7 @@ class JdCookie:
             'uuid':loginInfo.getUuid(),
             '_t':loginInfo.getToken(),
             'loginType':loginInfo.getLoginType(),
-            'loginname':'15718889614',
+            'loginname':'15718888884',
             'nloginpwd':'lqd.123456',
             'authcode':loginInfo.getAuthCode(),
             'pubKey':loginInfo.getPubKey(),
@@ -83,6 +87,10 @@ class JdCookie:
         #保存cookie到文件
         #ignore_discard的意思是即使cookies将被丢弃也将它保存下来
         #ignore_expires的意思是如果在该文件中cookies已经存在，则覆盖原文件写入
+        for item in cookie:
+            print 'name:' + item.name + '-value:' + item.value
+        
+        sys.exit()
         cookie.save(ignore_discard=True,ignore_expires=True)
         
     def getCookie(self):
