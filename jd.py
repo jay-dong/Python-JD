@@ -1,6 +1,7 @@
 #!usr/bin/env python
 #coding=utf8
 import json
+import demjson
 from lxml import etree
 import urllib2
 import urllib
@@ -15,11 +16,19 @@ import os
 import time
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
+'''
+    写的有点乱哈，仅使用玩耍
+    正常开发别和我这样写哦
+    header项的cookie必须加上，具体原因就不说明了
+'''
 class Jd:
     
     def __init__(self,url):
 
-        header={'User-agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'}
+        header={
+            'User-agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
+            'Cookie':''
+        }
         request=urllib2.Request(url,headers=header)
         html=urllib2.urlopen(request).read()
         html=html.decode('utf-8')
@@ -34,12 +43,8 @@ class Jd:
         return db
     #获取品牌信息
     def getBrandList(self):
-        dic={}
-        brand={}
-        brandId=self.selector.xpath("//ul[@id='brandsArea']/li/@id")
-        brandName=self.selector.xpath("//ul[@id='brandsArea']/li/a/@title")
-        data=dict(zip(brandId,brandName))
-        return data
+        
+        return self.html
     #获取页数
     def getGoodsPage(self):
         selector=self.selector
@@ -68,7 +73,7 @@ class Jd:
              date=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime())
              print data[id]
              try:
-                db.goods.insert({'BrandId':brandId,'brandName':name,'GoodsName':data[id],'GoodsId':id,'url':self.url,'date':date})
+                db.boy.insert({'BrandId':brandId,'brandName':name,'GoodsName':data[id],'GoodsId':id,'url':self.url,'date':date})
                 self.id+=1
                  #print '写入成功id:'+str(id)
              except IOError as e:
@@ -89,26 +94,27 @@ class Jd:
     def __call__(self,url):
         pass
     
-JD=Jd('https://list.jd.com/list.html?cat=670,671,672')
+JD=Jd('https://list.jd.com/list.html?cat=1315,1342&page=1&sort=sort_totalsales15_desc&trans=1&md=1&my=list_brand')
 brand=JD.getBrandList()
+brand=json.loads(brand)
 if __name__=="__main__":
     #n=0
-    #while n<4:
-        for ur in brand:
-            
-            brandId=ur.lstrip("brand-")
-            url="https://list.jd.com/list.html?cat=670,671,672&ev=exbrand_"+brandId+'&sort=sort_totalsales15_desc&trans=1&JL=6_0_0#J_main'
-            jdpage=Jd(url)
-            page=jdpage.getGoodsPage()
-            i=1
-            while i<page: 
-                jdList=Jd('https://list.jd.com/list.html?cat=670,671,672&ev=exbrand_'+brandId+'&page='+str(i)+'&sort=sort_totalsales15_desc&trans=1&JL=6_0_0#J_main')
-                # p=multiprocessing.Process(target=jdList.goodsInfo,args=(brandId,str(brand[ur])))
-                # p.start()
-                # p.join
-                #thread.start_new_thread(jdList.goodsInfo,(brandId,str(brand[ur])))
-                jdList.goodsInfo(brandId,str(brand[ur]))
-                i+=1
+    #while n<4:    
+    for ur in brand['brands']:
+        print '开始品牌：'+ur['name']
+        url="https://list.jd.com/list.html?cat=1315,1342&ev=exbrand_"+str(ur['id'])+'&sort=sort_totalsales15_desc&trans=1&JL=6_0_0#J_main'
+        print url
+        jdpage=Jd(url)
+        page=jdpage.getGoodsPage()
+        i=1
+        while i<=page: 
+            jdList=Jd('https://list.jd.com/list.html?cat=1315,1342&ev=exbrand_'+str(ur['id'])+'&page='+str(i)+'&sort=sort_totalsales15_desc&trans=1&JL=6_0_0#J_main')
+            # p=multiprocessing.Process(target=jdList.goodsInfo,args=(brandId,str(brand[ur])))
+            # p.start()
+            # p.join
+            thread.start_new_thread(jdList.goodsInfo,(ur['id'],str(ur['name'])))
+            #jdList.goodsInfo(brandId,str(brand[ur]))
+            i+=1
             
         #n+=1     
         #print JD.getGoodsPage()
