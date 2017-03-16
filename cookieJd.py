@@ -64,16 +64,7 @@ class JdCookie:
         return postData
     
     def loginSaveCookie(self):
-#         filename='cookie.txt'
-#         cookie=cookielib.MozillaCookieJar(filename)
-#         handlerLocal=urllib2.HTTPCookieProcessor(cookie)
-#         opener=urllib2.build_opener(handlerLocal)
-#         result=opener.open("https://passport.jd.com/uc/loginService",self.loginParam())
-#         cookie.save(ignore_discard=True, ignore_expires=True)
-#         gradeUrl = 'https://order.jd.com/center/list.action'
-#         #请求访问成绩查询网址
-#         result = opener.open(gradeUrl)
-#         print result.read()
+
         #设置保存cookie的文件
         filename = 'cookie.txt'
         #声明一个MozillaCookieJar对象来保存cookie，之后写入文件
